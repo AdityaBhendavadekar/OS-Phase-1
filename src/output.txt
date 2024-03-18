@@ -1,0 +1,11 @@
+HIf
+HI
+NOTSAME
+
+VIT
+VIT
+SAME
+
+*
+**
+***

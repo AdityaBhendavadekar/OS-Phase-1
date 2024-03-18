@@ -1,11 +1,9 @@
 import java.awt.color.ICC_ColorSpace;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class Main2 {
     BufferedReader br;
+    FileWriter writer;
     char[][] mainMemory = new char[100][4];
     char[] registerR = new char[4];
     char[] registerIR;
@@ -13,10 +11,11 @@ public class Main2 {
     boolean registerC;
     int memoryUsed;
     int SI;
-    public Main2(String f){
+    public Main2(String input, String output){
         try{
-            File fd = new File(f);
+            File fd = new File(input);
             br = new BufferedReader(new FileReader(fd));
+            writer = new FileWriter(output);
         }catch(Exception e ){System.out.println(e);}
     }
     public void LOAD(){
@@ -34,19 +33,18 @@ public class Main2 {
 
                 } else if (arr[0] == '$' && arr[1] == 'E' && arr[2] == 'N' && arr[3] == 'D') {
                     System.out.println("\nEnd card.");
-                }
-                if((memoryUsed==100)){
-                    System.out.println("No more memory.");
-                }
-
-                for (int i = 0; i < str.length(); i++) {
-                    if (i % 4 == 0 && i != 0) {
-                        memoryUsed++;
+                    writer.write("\n");
+                }else {
+                    if ((memoryUsed == 100)) {
+                        System.out.println("No more memory.");
                     }
-                    mainMemory[memoryUsed][i % 4] = arr[i];
-//                        System.out.println("Memory contents: "+mainMemory[memoryUsed][i%4]);
+                    for (int i = 0; i < str.length(); i++) {
+                        if (i % 4 == 0 && i != 0) {
+                            memoryUsed++;
+                        }
+                        mainMemory[memoryUsed][i % 4] = arr[i];
+                    }
                 }
-
             }
         }catch(Exception e){
             System.out.println("jai ho");
@@ -79,71 +77,58 @@ public class Main2 {
             registerIC++;
 
             if(registerIR[0] == 'L' && registerIR[1] == 'R'){
-
-                System.out.println("---LR---");
-                System.out.println(registerIR[0]+" "+registerIR[1]);
-
                 int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
                 registerR[0]=mainMemory[loc][0];
                 registerR[1] =mainMemory[loc][1];
                 registerR[2] =mainMemory[loc][2];
                 registerR[3]=mainMemory[loc][3];
-
-                for(int i=0;i<4;i++){
-                    System.out.println(registerR[i]);
+            }
+            else if(registerIR[0] == 'S' && registerIR[1] == 'R'){
+                int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
+                mainMemory[loc][0]=registerR[0];
+                mainMemory[loc][1] =registerR[1];
+                mainMemory[loc][2] =registerR[2];
+                mainMemory[loc][3]=registerR[3];
+            }
+            else if(registerIR[0] == 'B' && registerIR[1] == 'T'){
+                int loc = Integer.parseInt(String.valueOf(registerIR[2]) + String.valueOf(registerIR[3]));
+                if(registerC == true){
+                    registerIC=loc;
+                    registerC=false;
                 }
-
-            }  else if(registerIR[0] == 'S' && registerIR[1] == 'R'){
-
-
-            }  else if(registerIR[0] == 'B' && registerIR[1] == 'T'){
-
-
-            }  else {
-                if (registerIR[0] == 'C' && registerIR[1] == 'R') {
-                    int loc = Integer.parseInt(String.valueOf(registerIR[2]) + String.valueOf(registerIR[3]));
-                    if (mainMemory[loc][0] == registerR[0] && mainMemory[loc][1] == registerR[1] && mainMemory[loc][2] == registerR[2] && mainMemory[loc][3] == registerR[3]) {
-                        registerC = true;
-                    } else {
-                        registerC = false;
-                    }
-                } else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
+            }
+            else if (registerIR[0] == 'C' && registerIR[1] == 'R') {
+                int loc = Integer.parseInt(String.valueOf(registerIR[2]) + String.valueOf(registerIR[3]));
+                if (mainMemory[loc][0] == registerR[0] && mainMemory[loc][1] == registerR[1] && mainMemory[loc][2] == registerR[2] && mainMemory[loc][3] == registerR[3]) {
+                    registerC = true;
+                } else {
+                    registerC = false;
+                }
+            } else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
                     System.out.println("Reading data");
                     SI = 1;
                     masterMode();
-                } else if (registerIR[0] == 'P' && registerIR[1] == 'D') {
+            } else if (registerIR[0] == 'P' && registerIR[1] == 'D') {
                     SI = 2;
                     masterMode();
-                } else if (registerIR[0] == 'H') {
-//                SI = 3;
+            } else if (registerIR[0] == 'H') {
+                SI = 3;
                     break;
                 }
             }
-//            else if(registerIR[0]== 'L' && registerIR[1]=='R'){
-//                registerIR[3]='0';
-//                int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
-//
-//                String data, total ="";
-//                char[] charArr;
-//
-//                for(int i=0;i<10;i++){
-//                    for (int j=0;j<4;j++){
-//                        System.out.print(mainMemory[loc][j]);
-//                    }
-//                    loc++;
-//                }
-//            }
         }
-    }
+
     public void masterMode(){
         switch(SI){
             case 1:
-                System.out.println("Master mode read");
                 read();
                 break;
             case 2:
-                System.out.println("Master mode write output");
-                write();
+                try {
+                    writeData();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case 3:
                 halt();
@@ -155,57 +140,47 @@ public class Main2 {
     }
 
     void read(){
-
         registerIR[3]='0';
         int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
-
-//        System.out.print("IR Register");
-//        System.out.println(String.valueOf(registerIR[2]));
-
-//        System.out.println( "Loc: "+loc);
-
         char[] charArr;
         String str;
-
         try {
             str = br.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        System.out.println("inside read"+str.length());
         int len = str.length();
-
         charArr = str.toCharArray();
-
         for(int i=0;i<len;i++){
-//            System.out.println("inside for");
-//            System.out.println(" " +charArr[i] +" "+loc);
             if(i%4==0 && i!=0){
                 loc++;
             }
-
-            // data gets loaded into memory at location
             mainMemory[loc][i%4]=charArr[i];
-//            System.out.print(mainMemory[loc][i%4]);
-
         }
     }
-    void write(){
+    void writeData() throws IOException {
         registerIR[3]='0';
+        String str = new String();
         int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
-//        System.out.println(loc);
-
         String data, total ="";
         char[] charArr;
-
         for(int i=0;i<10;i++){
-            for (int j=0;j<4;j++){
-                System.out.print(mainMemory[loc][j]);
+            str += new String(mainMemory[loc+i]);
+            str = str.trim();
+            if(!str.isEmpty()){
+              total=  total.concat(str);
             }
-            loc++;
         }
+        System.out.println(""+str);
+        writer.write(str+"\n");
+        writer.flush();
     }
     void halt(){
         return;
+    }
+    public void print_memory(){
+        for(int i=0;i<100;i++) {
+            System.out.println("memory["+i+"] "+new String(mainMemory[i]));
+        }
     }
 }

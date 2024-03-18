@@ -10,7 +10,7 @@
 
 public class Main{
     public static void main(String[] args){
-        Main2 obj = new Main2("D:\\B-Tech\\Programming\\untitled\\src\\data.txt");
+        Main2 obj = new Main2("src/data.txt","src/output.txt");
         obj.LOAD();
     }
 }
