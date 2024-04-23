@@ -18,6 +18,7 @@ public class Main2 {
             writer = new FileWriter(output);
         }catch(Exception e ){System.out.println(e);}
     }
+
     public void LOAD(){
         String str;
         char[] arr = new char[20];
