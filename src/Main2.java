@@ -59,6 +59,13 @@ public class Main2 {
         registerIC = 0;
         memoryUsed = 0;
         SI = 0;
+
+        for (int i=0;i<100;i++){
+            for (int j=0;j<4;j++){
+                mainMemory[i][j]=' ';
+            }
+        }
+
         System.out.println("Memory Initialised");
     }
     public void startExecution(){
@@ -78,6 +85,7 @@ public class Main2 {
             registerIC++;
 
             if(registerIR[0] == 'L' && registerIR[1] == 'R'){
+                System.out.println("Load register");
                 int loc = Integer.parseInt(String.valueOf(registerIR[2])+String.valueOf(registerIR[3]));
                 registerR[0]=mainMemory[loc][0];
                 registerR[1] =mainMemory[loc][1];
@@ -105,7 +113,39 @@ public class Main2 {
                 } else {
                     registerC = false;
                 }
-            } else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
+            }else if (registerIR[0]=='A' && registerIR[1]=='D'){
+                // Addition operation
+                int loc = Integer.parseInt(String.valueOf(registerIR[2]) + String.valueOf(registerIR[3]));
+                String num1Str = new String(mainMemory[loc]).trim();
+                String num2Str = new String(registerR).trim();
+
+                int num1 = Integer.parseInt(num1Str);
+                int num2 = Integer.parseInt(num2Str);
+                int result = num1 + num2;
+
+                String resultStr = String.format("%04d", result);
+                for (int i = 0; i < 4; i++) {
+                    registerR[i] = resultStr.charAt(i);
+                }
+            }else if (registerIR[0]=='S' && registerIR[1]=='B'){
+                // subtraction operation.
+                int loc = Integer.parseInt(String.valueOf(registerIR[2]) + String.valueOf(registerIR[3]));
+                String num2Str = new String(mainMemory[loc]).trim();
+                String num1Str = new String(registerR).trim();
+
+                int num1 = Integer.parseInt(num1Str);
+                int num2 = Integer.parseInt(num2Str);
+                int result = num1 - num2;
+
+                String resultStr = String.format("%04d", result);
+                for (int i = 0; i < 4; i++) {
+                    registerR[i] = resultStr.charAt(i);
+                }
+                if(result<0){
+                    registerR[0]='1';
+                }
+            }
+            else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
                     System.out.println("Reading data");
                     SI = 1;
                     masterMode();
