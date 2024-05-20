@@ -44,6 +44,7 @@ public class Main2 {
                             memoryUsed++;
                         }
                         mainMemory[memoryUsed][i % 4] = arr[i];
+//                        print_memory();
                     }
                 }
             }
@@ -51,6 +52,7 @@ public class Main2 {
             System.out.println("jai ho");
         }
     }
+
     public void init(){
         mainMemory = new char[100][4];
         registerR = new char[4];
@@ -142,10 +144,9 @@ public class Main2 {
                     registerR[i] = resultStr.charAt(i);
                 }
                 if(result<0){
-                    registerR[0]='1';
+                    registerR[0]='-';
                 }
-            }
-            else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
+            }else if (registerIR[0] == 'G' && registerIR[1] == 'D') {
                     System.out.println("Reading data");
                     SI = 1;
                     masterMode();
@@ -154,6 +155,7 @@ public class Main2 {
                     masterMode();
             } else if (registerIR[0] == 'H') {
                 SI = 3;
+                masterMode();
                     break;
                 }
             }
